@@ -1,0 +1,7 @@
+
+fsquid:UselessImportCheck"8Remove this unused import 'java.util.stream.Collectors'.(Óóº´úÿÿÿÿ8“ÆûåÑ,
+Xsquid:UselessImportCheck"*Remove this unused import 'java.util.Set'.(ö²„¤şÿÿÿÿ8¹›“ÀÑ,
+^squid:UselessImportCheck"0Remove this unused import 'java.util.Map.Entry'.(±şê¾úÿÿÿÿ8¿µÀÑ,
+Vsquid:UselessImportCheck".Remove this unused import 'java.util.HashSet'.(Ê‚êX8¹›“ÀÑ,
+asquid:UselessImportCheck"8Remove this unused import 'java.util.function.Function'.(»³Í8“ÆûåÑ,
+\squid:UselessImportCheck".Remove this unused import 'java.util.HashMap'.(™˜”€ùÿÿÿÿ8¦¡¨ÀÑ,
