@@ -53,7 +53,9 @@ public class SudokuSolver {
 
   private void solvePuzzle(int row, int column, SudokuGridCell[][] currentGrid) {
     if(row == NUMBER_OF_ROWS - 1 && column == NUMBER_OF_COLUMNS - 1) {
-      solutions.add(currentGrid);
+      SudokuGridCell[][] copyOfGrid = copyGrid(currentGrid);
+
+      solutions.add(copyOfGrid);
     } else {
       int nextColumn = column == NUMBER_OF_COLUMNS - 1 ? 0 : column + 1;
       int nextRow = column == NUMBER_OF_COLUMNS - 1 ?  row + 1 : row;
@@ -61,18 +63,20 @@ public class SudokuSolver {
       if(SudokuGridCell.SudokuGridCellType.PREDEFINED.equals(grid[row][column].getCellType())) {
         solvePuzzle(nextRow, nextColumn, currentGrid);
       } else {
+        SudokuGridCell originalGridCell = grid[row][column];
+
         for(int i = 0; i < ALPHABET.length; i++) {
           Character value = ALPHABET[i];
 
           SudokuGridCell gridCellToTry = new SudokuGridCell(row, column, SudokuGridCell.SudokuGridCellType.USER_DEFINED, value);
 
           if(positionValidWithNewCell(gridCellToTry, currentGrid)) {
-            SudokuGridCell[][] copyOfGrid = copyGrid(currentGrid);
+            grid[row][column] = gridCellToTry;
 
-            copyOfGrid[row][column] = gridCellToTry;
-
-            solvePuzzle(nextRow, nextColumn, copyOfGrid);
+            solvePuzzle(nextRow, nextColumn, grid);
           }
+
+          grid[row][column] = originalGridCell;
         }
       }
     }
