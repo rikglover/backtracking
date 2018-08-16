@@ -22,7 +22,7 @@ public class SudokuSolverTest {
       { ' ', ' ', ' ', ' ', '8', ' ', ' ', '7', '9' }
   };
 
-  Character[][] SOLVED_PUZZLE = {
+  private static final Character[][] SOLVED_PUZZLE = {
       { '5', '3', '4', '6', '7', '8', '9', '1', '2' },
       { '6', '7', '2', '1', '9', '5', '3', '4', '8' },
       { '1', '9', '8', '3', '4', '2', '5', '6', '7' },
@@ -41,6 +41,7 @@ public class SudokuSolverTest {
     SudokuGridCell[][] solution = solutions.get(0);
     boolean puzzleSolved = puzzleSolved(solution);
 
+    assertThat(solutions).hasSize(1);
     assertThat(puzzleSolved).isTrue();
   }
 
@@ -58,5 +59,4 @@ public class SudokuSolverTest {
 
     return true;
   }
-
 }

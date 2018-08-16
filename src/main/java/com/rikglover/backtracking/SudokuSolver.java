@@ -1,6 +1,7 @@
 package com.rikglover.backtracking;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,16 +45,14 @@ public class SudokuSolver {
   }
 
   public List<SudokuGridCell[][]> solvePuzzle() {
-    SudokuGridCell[][] copyOfGrid = copyGrid(grid);
-
-    solvePuzzle(0, 0, copyOfGrid);
+    solvePuzzle(0, 0);
 
     return solutions;
   }
 
-  private void solvePuzzle(int row, int column, SudokuGridCell[][] currentGrid) {
+  private void solvePuzzle(int row, int column) {
     if(row == NUMBER_OF_ROWS - 1 && column == NUMBER_OF_COLUMNS - 1) {
-      SudokuGridCell[][] copyOfGrid = copyGrid(currentGrid);
+      SudokuGridCell[][] copyOfGrid = copyGrid(grid);
 
       solutions.add(copyOfGrid);
     } else {
@@ -61,7 +60,7 @@ public class SudokuSolver {
       int nextRow = column == NUMBER_OF_COLUMNS - 1 ?  row + 1 : row;
 
       if(SudokuGridCell.SudokuGridCellType.PREDEFINED.equals(grid[row][column].getCellType())) {
-        solvePuzzle(nextRow, nextColumn, currentGrid);
+        solvePuzzle(nextRow, nextColumn);
       } else {
         SudokuGridCell originalGridCell = grid[row][column];
 
@@ -70,36 +69,32 @@ public class SudokuSolver {
 
           SudokuGridCell gridCellToTry = new SudokuGridCell(row, column, SudokuGridCell.SudokuGridCellType.USER_DEFINED, value);
 
-          if(positionValidWithNewCell(gridCellToTry, currentGrid)) {
+          if(positionValidWithNewCell(gridCellToTry)) {
             grid[row][column] = gridCellToTry;
-
-            solvePuzzle(nextRow, nextColumn, grid);
+            solvePuzzle(nextRow, nextColumn);
+            grid[row][column] = originalGridCell;
           }
-
-          grid[row][column] = originalGridCell;
         }
       }
     }
   }
 
   private SudokuGridCell[][] copyGrid(SudokuGridCell[][] gridToCopy) {
-    SudokuGridCell[][] gridCopy = new SudokuGridCell[NUMBER_OF_ROWS][NUMBER_OF_COLUMNS];
+    SudokuGridCell[][] gridCopy = new SudokuGridCell[NUMBER_OF_ROWS][];
 
     for(int i = 0; i < NUMBER_OF_ROWS; i++) {
-      for(int j = 0; j < NUMBER_OF_COLUMNS; j++) {
-        gridCopy[i][j] = gridToCopy[i][j];
-      }
+      gridCopy[i] = Arrays.copyOf(gridToCopy[i], NUMBER_OF_COLUMNS);
     }
 
     return gridCopy;
   }
 
-  private boolean positionValidWithNewCell(SudokuGridCell newCell, SudokuGridCell[][] currentGrid) {
-    return rowValidWithNewCell(newCell, currentGrid) && columnValidWithNewCell(newCell, currentGrid) && regionValidWithNewCell(newCell, currentGrid);
+  private boolean positionValidWithNewCell(SudokuGridCell newCell) {
+    return rowValidWithNewCell(newCell) && columnValidWithNewCell(newCell) && regionValidWithNewCell(newCell);
   }
 
-  private boolean rowValidWithNewCell(SudokuGridCell newCell, SudokuGridCell[][] currentGrid) {
-    int nonNullCellCount = 1;
+  private boolean rowValidWithNewCell(SudokuGridCell newCell) {
+    int cellsWithValueCount = 1;
     int row = newCell.getRow();
 
     Set<Character> gridCellValues = new HashSet<>();
@@ -107,19 +102,19 @@ public class SudokuSolver {
     gridCellValues.add(newCell.getValue());
 
     for(int column = 0; column < NUMBER_OF_COLUMNS; column++) {
-      SudokuGridCell currentGridCell = currentGrid[row][column];
+      SudokuGridCell currentGridCell = grid[row][column];
 
       if(currentGridCell.getValue() != UNDEFINED) {
-        nonNullCellCount += 1;
+        cellsWithValueCount += 1;
         gridCellValues.add(currentGridCell.getValue());
       }
     }
 
-    return gridCellValues.size() == nonNullCellCount;
+    return gridCellValues.size() == cellsWithValueCount;
   }
 
-  private boolean columnValidWithNewCell(SudokuGridCell newCell, SudokuGridCell[][] currentGrid) {
-    int nonNullCellCount = 1;
+  private boolean columnValidWithNewCell(SudokuGridCell newCell) {
+    int cellsWithValueCount = 1;
     int column = newCell.getColumn();
 
     Set<Character> gridCellValues = new HashSet<>();
@@ -127,19 +122,19 @@ public class SudokuSolver {
     gridCellValues.add(newCell.getValue());
 
     for(int row = 0; row < NUMBER_OF_ROWS; row++) {
-      SudokuGridCell currentGridCell = currentGrid[row][column];
+      SudokuGridCell currentGridCell = grid[row][column];
 
       if(currentGridCell.getValue() != UNDEFINED) {
-        nonNullCellCount += 1;
+        cellsWithValueCount += 1;
         gridCellValues.add(currentGridCell.getValue());
       }
     }
 
-    return gridCellValues.size() == nonNullCellCount;
+    return gridCellValues.size() == cellsWithValueCount;
   }
 
-  private boolean regionValidWithNewCell(SudokuGridCell newCell, SudokuGridCell[][] currentGrid) {
-    int nonNullCellCount = 1;
+  private boolean regionValidWithNewCell(SudokuGridCell newCell) {
+    int cellsWithValueCount = 1;
     int startingRow = getStartingRowForRegion(newCell.getRow());
     int startingColumn = getStartingColumnForRegion(newCell.getColumn());
 
@@ -149,16 +144,16 @@ public class SudokuSolver {
 
     for(int row = startingRow; row < startingRow + ROWS_PER_REGION; row++) {
       for(int column = startingColumn; column < startingColumn + COLUMNS_PER_REGION; column++) {
-        SudokuGridCell currentGridCell = currentGrid[row][column];
+        SudokuGridCell currentGridCell = grid[row][column];
 
         if(currentGridCell.getValue() != UNDEFINED) {
-          nonNullCellCount += 1;
+          cellsWithValueCount += 1;
           gridCellValues.add(currentGridCell.getValue());
         }
       }
     }
 
-    return gridCellValues.size() == nonNullCellCount;
+    return gridCellValues.size() == cellsWithValueCount;
   }
 
   private int getStartingRowForRegion(int row) {

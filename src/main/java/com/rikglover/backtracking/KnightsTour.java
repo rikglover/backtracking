@@ -1,10 +1,10 @@
 package com.rikglover.backtracking;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Deque;
 import java.util.List;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,7 +27,9 @@ public class KnightsTour {
     this.numberOfColumns = numberOfColumns;
   }
 
-  private Set<ChessBoardPosition> getLegalNextPositions(List<ChessBoardPosition> previousPositions, ChessBoardPosition currentPosition) {
+  private List<ChessBoardPosition> getPossibleNextPositions(Deque<ChessBoardPosition> previousPositions) {
+    ChessBoardPosition currentPosition = previousPositions.getLast();
+
     int row = currentPosition.getRow();
     int column = currentPosition.getColumn();
 
@@ -40,7 +42,7 @@ public class KnightsTour {
     ChessBoardPosition backward2Left1 = new ChessBoardPosition(row - 2, column - 1);
     ChessBoardPosition backward2Right1 = new ChessBoardPosition(row - 2, column + 1);
 
-    List<ChessBoardPosition> possiblePositions = Arrays.asList(forward1Left2,
+    return Arrays.asList(forward1Left2,
         forward1Right2,
         forward2Left1,
         forward2Right1,
@@ -49,33 +51,30 @@ public class KnightsTour {
         backward2Left1,
         backward2Right1
     );
-
-    Set<ChessBoardPosition> legalPositions = new HashSet<>();
-
-    for (ChessBoardPosition position : possiblePositions) {
-      boolean rowIsOutOfBounds = position.getRow() < 0 || position.getRow() > numberOfRows - 1;
-      boolean columnIsOutOfBounds = position.getColumn() < 0 || position.getColumn() > numberOfColumns - 1;
-      boolean positionAlreadyUsed = previousPositions.indexOf(position) != -1;
-
-      if (!rowIsOutOfBounds && !columnIsOutOfBounds && !positionAlreadyUsed) {
-        legalPositions.add(position);
-      }
-    }
-
-    return legalPositions;
   }
 
-  private void findSolutions(List<ChessBoardPosition> previousPositions, ChessBoardPosition currentPosition) {
+  private boolean positionIsLegal(ChessBoardPosition position, Deque<ChessBoardPosition> previousPositions) {
+    boolean rowIsOutOfBounds = position.getRow() < 0 || position.getRow() > numberOfRows - 1;
+    boolean columnIsOutOfBounds = position.getColumn() < 0 || position.getColumn() > numberOfColumns - 1;
+    boolean positionAlreadyUsed = previousPositions.contains(position);
+
+    return !rowIsOutOfBounds && !columnIsOutOfBounds && !positionAlreadyUsed;
+  }
+
+  private void findSolutions(Deque<ChessBoardPosition> previousPositions) {
     if (previousPositions.size() == numberOfRows * numberOfColumns ) {
-      solutions.add(previousPositions);
+      List<ChessBoardPosition> solution = new ArrayList<>(previousPositions);
+
+      solutions.add(solution);
     } else {
-      Set<ChessBoardPosition> legalNextPositions = getLegalNextPositions(previousPositions, currentPosition);
+      List<ChessBoardPosition> legalNextPositions = getPossibleNextPositions(previousPositions);
 
-      for (ChessBoardPosition legalNextPosition : legalNextPositions) {
-        List<ChessBoardPosition> partialSolution = new ArrayList<>(previousPositions);
-
-        partialSolution.add(legalNextPosition);
-        findSolutions(partialSolution, legalNextPosition);
+      for (ChessBoardPosition position : legalNextPositions) {
+        if(positionIsLegal(position, previousPositions)) {
+          previousPositions.addLast(position);
+          findSolutions(previousPositions);
+          previousPositions.removeLast();
+        }
       }
     }
   }
@@ -83,11 +82,12 @@ public class KnightsTour {
   public List<List<ChessBoardPosition>> findSolutions() {
     for (int row = 0; row < numberOfRows; row++) {
       for (int column = 0; column < numberOfColumns; column++) {
+        Deque<ChessBoardPosition> positions = new ArrayDeque<>();
         ChessBoardPosition firstPosition = new ChessBoardPosition(row, column);
 
-        List<ChessBoardPosition> positions = Arrays.asList(firstPosition);
-
-        findSolutions(positions, firstPosition);
+        positions.addLast(firstPosition);
+        findSolutions(positions);
+        positions.removeLast();
       }
     }
 
