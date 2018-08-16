@@ -19,14 +19,14 @@ public class CombinationsTest {
 
   private Object[][] getParameters() {
     return new Object[][] {
-//        { "ab", 3 },
-        { "abcd", 7 },
-//        { "abcdef", 63 },
-//        { "aa", 3 },
-//        { "abb", 7 },
-//        { "banana", 63 },
-//        { "bbbbbb", 63 },
-//        { "bananas", 127 }
+        { "ab", 3 },
+        { "abcd", 15 },
+        { "abcdef", 63 },
+        { "aa", 3 },
+        { "abb", 7 },
+        { "banana", 63 },
+        { "bbbbbb", 63 },
+        { "bananas", 127 }
     };
   }
 
